@@ -2,13 +2,14 @@
 import ujson
 
 from common.access import internal, InternalError
+from common.handler import JsonHandler
 from model.discovery import ServiceNotFound, DiscoveryModel
 
-from tornado.web import RequestHandler, HTTPError
+from tornado.web import HTTPError
 from tornado.gen import coroutine, Return
 
 
-class DiscoverServiceHandler(RequestHandler):
+class DiscoverServiceHandler(JsonHandler):
     def wrap(self, service):
         return service + "/v" + self.application.api_version
 
@@ -66,12 +67,12 @@ class MultiDiscoverHandler(DiscoverServiceHandler):
             raise HTTPError(404, "Service '{0}' was not found".format(e.service_id))
 
         if self.get_argument("version", "true") == "true":
-            self.write(ujson.dumps({
+            self.dumps({
                 service: self.wrap(location)
                 for service, location in service_ids.iteritems()
-            }))
+            })
         else:
-            self.write(ujson.dumps(service_ids))
+            self.dumps(service_ids)
 
 
 class MultiDiscoverNetworkHandler(DiscoverServiceHandler):
@@ -93,15 +94,15 @@ class MultiDiscoverNetworkHandler(DiscoverServiceHandler):
                 "Service '{0}' was not found".format(e.service_id))
 
         if self.get_argument("version", "true") == "true":
-            self.write(ujson.dumps({
+            self.dumps({
                 service: self.wrap(location)
                 for service, location in service_ids.iteritems()
-            }))
+            })
         else:
             self.write(service_ids)
 
 
-class ServiceInternalHandler(RequestHandler):
+class ServiceInternalHandler(JsonHandler):
     @coroutine
     @internal
     def get(self, service_id, network):
@@ -114,10 +115,10 @@ class ServiceInternalHandler(RequestHandler):
             raise HTTPError(
                 400, "No such service")
 
-        self.write(ujson.dumps({
+        self.dumps({
             "id": service_id,
             "location": service
-        }))
+        })
 
     @coroutine
     @internal
@@ -129,17 +130,17 @@ class ServiceInternalHandler(RequestHandler):
             service_location,
             network)
 
-        self.write({"result": "OK"})
+        self.dumps({"result": "OK"})
 
 
-class ServiceListInternalHandler(RequestHandler):
+class ServiceListInternalHandler(JsonHandler):
     @coroutine
     @internal
     def get(self, network):
 
         services_list = yield self.application.services.list_all_services(network)
 
-        self.write(ujson.dumps(services_list))
+        self.dumps(services_list)
 
 
 class InternalHandler(object):
