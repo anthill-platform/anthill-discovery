@@ -25,6 +25,7 @@ class DiscoveryServer(common.server.Server):
             "index": admin.RootAdminController,
             "service": admin.ServiceController,
             "new_service": admin.NewServiceController,
+            "clone_service": admin.CloneServiceController,
             "services": admin.ServicesController
         }
 

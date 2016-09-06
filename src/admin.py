@@ -49,6 +49,65 @@ class NewServiceController(a.AdminController):
         return ["discovery_admin"]
 
 
+class CloneServiceController(a.AdminController):
+    @coroutine
+    def clone(self, service_id, networks):
+
+        services = self.application.services
+
+        try:
+            networks = ujson.loads(networks)
+        except (KeyError, ValueError):
+            raise a.ActionError("Corrupted JSON")
+
+        yield services.set_service_networks(service_id, networks)
+
+        raise a.Redirect(
+            "service",
+            message="New service has been cloned",
+            service_id=service_id)
+
+    @coroutine
+    def get(self, service_id):
+
+        services = self.application.services
+
+        try:
+            networks = yield services.list_service_networks(service_id)
+        except ServiceNotFound:
+            raise a.ActionError("No such service: " + service_id)
+
+        result = {
+            "networks": networks
+        }
+
+        raise a.Return(result)
+
+    def render(self, data):
+        return [
+            a.breadcrumbs([
+                a.link("services", "Services")
+            ], "Clone service"),
+            a.form("Clone service '{0}'".format(self.context.get("service_id")), fields={
+                "service_id": a.field("Service ID", "text", "danger", "non-empty"),
+                "networks": a.field(
+                    "Service networks", "kv", "primary", "non-empty",
+                    values={network: network for network in DiscoveryModel.NETWORKS}),
+            }, methods={
+                "clone": a.method("Clone", "primary")
+            }, data=data),
+            a.links("Navigate", [
+                a.link("@back", "Go back")
+            ])
+        ]
+
+    def scopes_read(self):
+        return ["discovery_admin"]
+
+    def scopes_write(self):
+        return ["discovery_admin"]
+
+
 class RootAdminController(a.AdminController):
     def render(self, data):
         return [
@@ -106,7 +165,8 @@ class ServiceController(a.AdminController):
             }, data=data),
             a.links("Navigate", [
                 a.link("services", "Go back"),
-                a.link("new_service", "New service", "plus")
+                a.link("new_service", "New service", "plus"),
+                a.link("clone_service", "Clone service", "clone", service_id=self.context.get("service_id"))
             ])
         ]
 
