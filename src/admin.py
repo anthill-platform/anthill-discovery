@@ -42,10 +42,7 @@ class NewServiceController(a.AdminController):
             ])
         ]
 
-    def scopes_read(self):
-        return ["discovery_admin"]
-
-    def scopes_write(self):
+    def access_scopes(self):
         return ["discovery_admin"]
 
 
@@ -101,10 +98,7 @@ class CloneServiceController(a.AdminController):
             ])
         ]
 
-    def scopes_read(self):
-        return ["discovery_admin"]
-
-    def scopes_write(self):
+    def access_scopes(self):
         return ["discovery_admin"]
 
 
@@ -116,10 +110,7 @@ class RootAdminController(a.AdminController):
             ])
         ]
 
-    def scopes_read(self):
-        return ["discovery_admin"]
-
-    def scopes_write(self):
+    def access_scopes(self):
         return ["discovery_admin"]
 
 
@@ -170,10 +161,7 @@ class ServiceController(a.AdminController):
             ])
         ]
 
-    def scopes_read(self):
-        return ["discovery_admin"]
-
-    def scopes_write(self):
+    def access_scopes(self):
         return ["discovery_admin"]
 
     @coroutine
@@ -219,8 +207,5 @@ class ServicesController(a.AdminController):
             ])
         ]
 
-    def scopes_read(self):
-        return ["discovery_admin"]
-
-    def scopes_write(self):
+    def access_scopes(self):
         return ["discovery_admin"]
