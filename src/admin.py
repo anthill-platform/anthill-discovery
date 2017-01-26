@@ -38,7 +38,7 @@ class NewServiceController(a.AdminController):
                 "create": a.method("Create", "primary")
             }, data=data),
             a.links("Navigate", [
-                a.link("@back", "Go back")
+                a.link("@back", "Go back", icon="chevron-left")
             ])
         ]
 
@@ -94,7 +94,7 @@ class CloneServiceController(a.AdminController):
                 "clone": a.method("Clone", "primary")
             }, data=data),
             a.links("Navigate", [
-                a.link("@back", "Go back")
+                a.link("@back", "Go back", icon="chevron-left")
             ])
         ]
 
@@ -155,7 +155,7 @@ class ServiceController(a.AdminController):
                 "delete": a.method("Delete", "danger", order=2)
             }, data=data),
             a.links("Navigate", [
-                a.link("services", "Go back"),
+                a.link("services", "Go back", icon="chevron-left"),
                 a.link("new_service", "New service", "plus"),
                 a.link("clone_service", "Clone service", "clone", service_id=self.context.get("service_id"))
             ])
@@ -202,7 +202,7 @@ class ServicesController(a.AdminController):
                 a.link("service", service_id, icon="wrench", service_id=service_id) for service_id in data["services"]
             ]),
             a.links("Navigate", [
-                a.link("index", "Go back"),
+                a.link("index", "Go back", icon="chevron-left"),
                 a.link("new_service", "New service", "plus")
             ])
         ]
