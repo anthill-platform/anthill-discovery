@@ -36,6 +36,7 @@ class DiscoverHandler(DiscoverServiceHandler):
 
 class DiscoverNetworkHandler(DiscoverServiceHandler):
     @coroutine
+    @internal
     def get(self, service_name, network):
 
         try:
@@ -77,6 +78,7 @@ class MultiDiscoverHandler(DiscoverServiceHandler):
 
 class MultiDiscoverNetworkHandler(DiscoverServiceHandler):
     @coroutine
+    @internal
     def get(self, service_names, network):
 
         services_ids = filter(
