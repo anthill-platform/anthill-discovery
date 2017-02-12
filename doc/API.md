@@ -45,7 +45,7 @@ POST https://login-dev.anthillplatfrom.org/v0.1/auth
 
 ## Discover multiple services
 
-Returns a location for multiple services at a same time. Same as request above, but for multiple service.
+Returns a location for multiple services at a same time. Same as request above, but for multiple services.
 
 #### ← Request
 
@@ -103,7 +103,7 @@ Please note that `internal` locations are not accessable from the outside.
 ## Discover multiple services, for a network
 
 Returns a location for multiple services at a same time, for a given network. 
-Same as request above, but for multiple service.
+Same as request above, but for multiple services.
 
 #### ← Request
 
