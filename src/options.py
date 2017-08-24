@@ -4,12 +4,12 @@ from common.options import define
 # Main
 
 define("host",
-       default="http://discovery-dev.anthill",
+       default="http://localhost:9502",
        help="Public hostname of this service",
        type=str)
 
 define("listen",
-       default="port:10100",
+       default="unix:/usr/local/var/run/anthill/dev_discovery.sock",
        help="Socket to listen. Could be a port number (port:N), or a unix domain socket (unix:PATH)",
        type=str)
 

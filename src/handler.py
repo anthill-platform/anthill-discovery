@@ -11,7 +11,9 @@ from tornado.gen import coroutine, Return
 
 class DiscoverServiceHandler(JsonHandler):
     def wrap(self, service):
-        return service + "/v" + self.application.api_version
+        if self.application.api_version:
+            return service + "/v" + self.application.api_version
+        return service
 
 
 class DiscoverHandler(DiscoverServiceHandler):
