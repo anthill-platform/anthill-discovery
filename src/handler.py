@@ -2,14 +2,14 @@
 import ujson
 
 from common.access import internal, InternalError
-from common.handler import JsonHandler
+from common.handler import JsonHandler, CORSHandlerMixin
 from model.discovery import ServiceNotFound, DiscoveryModel
 
 from tornado.web import HTTPError
 from tornado.gen import coroutine, Return
 
 
-class DiscoverServiceHandler(JsonHandler):
+class DiscoverServiceHandler(CORSHandlerMixin, JsonHandler):
     def wrap(self, service):
         if self.application.api_version:
             return service + "/v" + self.application.api_version
