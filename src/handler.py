@@ -2,17 +2,15 @@
 import ujson
 
 from common.access import internal, InternalError
-from common.handler import JsonHandler, CORSHandlerMixin
+from common.handler import JsonHandler
 from model.discovery import ServiceNotFound, DiscoveryModel
 
 from tornado.web import HTTPError
 from tornado.gen import coroutine, Return
 
 
-class DiscoverServiceHandler(CORSHandlerMixin, JsonHandler):
+class DiscoverServiceHandler(JsonHandler):
     def wrap(self, service):
-        if self.application.api_version:
-            return service + "/v" + self.application.api_version
         return service
 
 
@@ -30,10 +28,7 @@ class DiscoverHandler(DiscoverServiceHandler):
                 404,
                 "Service '{0}' was not found".format(service_name))
 
-        if self.get_argument("version", "true") == "true":
-            self.write(self.wrap(service))
-        else:
-            self.write(service)
+        self.write(service)
 
 
 class DiscoverNetworkHandler(DiscoverServiceHandler):
@@ -51,10 +46,7 @@ class DiscoverNetworkHandler(DiscoverServiceHandler):
                 404,
                 "Service '{0}' was not found".format(service_name))
 
-        if self.get_argument("version", "true") == "true":
-            self.write(self.wrap(service))
-        else:
-            self.write(service)
+        self.write(service)
 
 
 class MultiDiscoverHandler(DiscoverServiceHandler):
@@ -69,13 +61,7 @@ class MultiDiscoverHandler(DiscoverServiceHandler):
         except ServiceNotFound as e:
             raise HTTPError(404, "Service '{0}' was not found".format(e.service_id))
 
-        if self.get_argument("version", "true") == "true":
-            self.dumps({
-                service: self.wrap(location)
-                for service, location in service_ids.iteritems()
-            })
-        else:
-            self.dumps(service_ids)
+        self.dumps(service_ids)
 
 
 class MultiDiscoverNetworkHandler(DiscoverServiceHandler):
@@ -97,13 +83,7 @@ class MultiDiscoverNetworkHandler(DiscoverServiceHandler):
                 404,
                 "Service '{0}' was not found".format(e.service_id))
 
-        if self.get_argument("version", "true") == "true":
-            self.dumps({
-                service: self.wrap(location)
-                for service, location in service_ids.iteritems()
-            })
-        else:
-            self.write(service_ids)
+        self.write(service_ids)
 
 
 class ServiceInternalHandler(JsonHandler):
