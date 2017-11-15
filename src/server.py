@@ -65,6 +65,7 @@ class DiscoveryServer(common.server.Server):
     def init_discovery(self):
         common.discover.cache = self.services
 
+
 if __name__ == "__main__":
 
     stt = common.server.init()
