@@ -43,3 +43,14 @@ define("discover_services_max_connections",
        help="Maximum connections to the service discovery database (connection pool).",
        group="discover_services",
        type=int)
+
+# Discovery services init file
+
+# If the service is started up with no records at all, the service will fill up the database with records from the
+# file provided. Please note that this will only happen once.
+
+define("services_init_file",
+       default="../dev/discovery-services.json",
+       help="JSON file with default services locations (used to initialize an empty database)",
+       group="discovery",
+       type=str)

@@ -4,6 +4,19 @@ import common.keyvalue
 from tornado.gen import coroutine, Return, Task
 from common.options import options
 from common.model import Model
+from common.validate import validate, validate_value, ValidationError
+
+import ujson
+import logging
+
+
+class DiscoveryError(Exception):
+    def __init__(self, code, message):
+        self.code = code
+        self.message = message
+
+    def __str__(self):
+        return str(self.code) + ": " + str(self.message)
 
 
 class DiscoveryModel(Model):
@@ -21,6 +34,47 @@ class DiscoveryModel(Model):
             host=options.discover_services_host,
             port=options.discover_services_port,
             db=options.discover_services_db)
+
+    @coroutine
+    def started(self):
+        services_init_file = options.services_init_file
+
+        if services_init_file and (yield self.is_empty()):
+            logging.info("Discovery records database is empty, initializing from {0}".format(services_init_file))
+
+            try:
+                with open(services_init_file, "r") as f:
+                    data = ujson.load(f)
+            except IOError as e:
+                raise DiscoveryError(500, "Failed to load services init file: " + str(e))
+            else:
+                yield self.setup_services(data)
+
+    @coroutine
+    @validate(data="json_dict")
+    def setup_services(self, data):
+        try:
+            services = validate_value(data["services"], "json_dict")
+        except (KeyError, ValueError):
+            raise DiscoveryError(400, "Init file has no 'services' section defined.")
+
+        for service_id, info in services.iteritems():
+            try:
+                networks = validate_value(info, "json_dict_of_strings")
+            except ValidationError as e:
+                raise DiscoveryError(400, e.message)
+
+            yield self.set_service_networks(service_id, networks)
+
+    @coroutine
+    def is_empty(self):
+        db = self.kv.acquire()
+
+        try:
+            keys = yield Task(db.keys, "*")
+            raise Return(len(keys) == 0)
+        finally:
+            yield db.release()
 
     @coroutine
     def delete_service(self, service_id):
@@ -127,6 +181,10 @@ class DiscoveryModel(Model):
                 service_id,
                 network,
                 service_location)
+
+            logging.info("Updated service '{0}' location to {1}/{2}".format(
+                service_id, network, str(service_location)))
+
         finally:
             yield db.release()
 
@@ -144,6 +202,9 @@ class DiscoveryModel(Model):
                     service_id,
                     network,
                     service_location)
+
+            logging.info("Updated service '{0}' location to {1}".format(service_id, str(networks)))
+
         finally:
             yield db.release()
 
