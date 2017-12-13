@@ -39,8 +39,11 @@ class DiscoveryModel(Model):
     def started(self):
         services_init_file = options.services_init_file
 
-        if services_init_file and (yield self.is_empty()):
-            logging.info("Discovery records database is empty, initializing from {0}".format(services_init_file))
+        if services_init_file:
+            is_empty = yield self.is_empty()
+
+            if is_empty:
+                logging.info("Discovery records database is empty, initializing from {0}".format(services_init_file))
 
             try:
                 with open(services_init_file, "r") as f:
@@ -48,7 +51,28 @@ class DiscoveryModel(Model):
             except IOError as e:
                 raise DiscoveryError(500, "Failed to load services init file: " + str(e))
             else:
+                if not is_empty:
+                    data = yield self.get_unloaded_data(data)
                 yield self.setup_services(data)
+
+    @coroutine
+    @validate(data="json_dict")
+    def get_unloaded_data(self, data):
+        db, _data = self.kv.acquire(), {"services": {}}
+        try:
+            db_keys = yield Task(db.keys, "*")
+            try:
+                data_keys = data["services"].keys()
+            except KeyError:
+                raise DiscoveryError(400, "Init file has no 'services' section defined.")
+            else:
+                if len(data_keys) > len(db_keys):
+                    for key in data_keys:
+                        if key not in db_keys:
+                            _data["services"][key] = data["services"][key]
+            raise Return(_data)
+        finally:
+            yield db.release()
 
     @coroutine
     @validate(data="json_dict")
