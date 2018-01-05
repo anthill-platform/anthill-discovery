@@ -132,7 +132,7 @@ class InternalHandler(object):
         self.application = application
 
     @coroutine
-    def get_service(self, service_id, network=None, version=True):
+    def get_service(self, service_id, network=None):
 
         services = self.application.services
 
