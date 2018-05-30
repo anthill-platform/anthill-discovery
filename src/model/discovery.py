@@ -36,7 +36,7 @@ class DiscoveryModel(Model):
             db=options.discover_services_db)
 
     @coroutine
-    def started(self):
+    def started(self, application):
         services_init_file = options.services_init_file
 
         if services_init_file and (yield self.is_empty()):
