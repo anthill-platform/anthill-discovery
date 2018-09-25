@@ -1,14 +1,12 @@
-import common.admin as a
+import anthill.common.admin as a
 
 import ujson
-from tornado.gen import coroutine
 
-from model.discovery import ServiceNotFound, DiscoveryModel
+from . model.discovery import ServiceNotFound, DiscoveryModel
 
 
 class NewServiceController(a.AdminController):
-    @coroutine
-    def create(self, service_id, networks):
+    async def create(self, service_id, networks):
 
         services = self.application.services
 
@@ -17,7 +15,7 @@ class NewServiceController(a.AdminController):
         except (KeyError, ValueError):
             raise a.ActionError("Corrupted JSON")
 
-        yield services.set_service_networks(service_id, networks)
+        await services.set_service_networks(service_id, networks)
 
         raise a.Redirect(
             "service",
@@ -47,8 +45,7 @@ class NewServiceController(a.AdminController):
 
 
 class CloneServiceController(a.AdminController):
-    @coroutine
-    def clone(self, service_id, networks):
+    async def clone(self, service_id, networks):
 
         services = self.application.services
 
@@ -57,20 +54,19 @@ class CloneServiceController(a.AdminController):
         except (KeyError, ValueError):
             raise a.ActionError("Corrupted JSON")
 
-        yield services.set_service_networks(service_id, networks)
+        await services.set_service_networks(service_id, networks)
 
         raise a.Redirect(
             "service",
             message="New service has been cloned",
             service_id=service_id)
 
-    @coroutine
-    def get(self, service_id):
+    async def get(self, service_id):
 
         services = self.application.services
 
         try:
-            networks = yield services.list_service_networks(service_id)
+            networks = await services.list_service_networks(service_id)
         except ServiceNotFound:
             raise a.ActionError("No such service: " + service_id)
 
@@ -78,7 +74,7 @@ class CloneServiceController(a.AdminController):
             "networks": networks
         }
 
-        raise a.Return(result)
+        return result
 
     def render(self, data):
         return [
@@ -116,22 +112,20 @@ class RootAdminController(a.AdminController):
 
 class ServiceController(a.AdminController):
     # noinspection PyUnusedLocal
-    @coroutine
-    def delete(self, **ignored):
+    async def delete(self, **ignored):
         service_id = self.context.get("service_id")
         services = self.application.services
 
-        yield services.delete_service(service_id)
+        await services.delete_service(service_id)
 
         raise a.Redirect("services", message="Service has been deleted")
 
-    @coroutine
-    def get(self, service_id):
+    async def get(self, service_id):
 
         services = self.application.services
 
         try:
-            networks = yield services.list_service_networks(service_id)
+            networks = await services.list_service_networks(service_id)
         except ServiceNotFound:
             raise a.ActionError("No such service: " + service_id)
 
@@ -139,7 +133,7 @@ class ServiceController(a.AdminController):
             "networks": networks
         }
 
-        raise a.Return(result)
+        return result
 
     def render(self, data):
         return [
@@ -164,8 +158,7 @@ class ServiceController(a.AdminController):
     def access_scopes(self):
         return ["discovery_admin"]
 
-    @coroutine
-    def update(self, networks):
+    async def update(self, networks):
 
         try:
             networks = ujson.loads(networks)
@@ -175,7 +168,7 @@ class ServiceController(a.AdminController):
         service_id = self.context.get("service_id")
         services = self.application.services
 
-        yield services.set_service_networks(service_id, networks)
+        await services.set_service_networks(service_id, networks)
 
         raise a.Redirect("service",
                          message="Service has been updated",
@@ -183,17 +176,16 @@ class ServiceController(a.AdminController):
 
 
 class ServicesController(a.AdminController):
-    @coroutine
-    def get(self):
+    async def get(self):
 
         services_data = self.application.services
-        services = yield services_data.list_all_services("external")
+        services = await services_data.list_all_services("external")
 
         result = {
             "services": services.keys()
         }
 
-        raise a.Return(result)
+        return result
 
     def render(self, data):
         return [

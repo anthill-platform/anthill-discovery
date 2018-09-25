@@ -6,7 +6,7 @@ This service allows to discover each service dynamically, at runtime.
 Each service is represented by few things: service `ID` and service locations.
 
 ## REST API
-Please refer to the <a href="doc/API.md">API Documentation</a> for complete information.
+Please refer to the <a href="https://docs.anthillplatform.org/en/latest/services/discovery.html">Documentation</a> for complete information.
 
 ## Multiple networks
 Not only players use discovery service, but other services do. 
