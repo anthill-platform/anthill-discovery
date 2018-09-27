@@ -59,7 +59,7 @@ class MultiDiscoverNetworkHandler(DiscoverServiceHandler):
                 404,
                 "Service '{0}' was not found".format(e.service_id))
 
-        self.write(service_ids)
+        self.dumps(service_ids)
 
 
 class ServiceInternalHandler(JsonHandler):
