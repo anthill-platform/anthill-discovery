@@ -7,6 +7,9 @@ DEPENDENCIES = [
 
 setup(
     name='anthill-discovery',
+    package_data={
+      "anthill.discovery": ["anthill/discovery/sql", "anthill/discovery/static"]
+    },
     setup_requires=["pypigit-version"],
     git_version="0.1.0",
     description='A dynamic server discovery service for Anthill platform',
