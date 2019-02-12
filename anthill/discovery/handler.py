@@ -44,21 +44,11 @@ class MultiDiscoverHandler(DiscoverServiceHandler):
 class MultiDiscoverNetworkHandler(DiscoverServiceHandler):
     @internal
     async def get(self, service_names, network):
-
-        services_ids = filter(
-            bool,
-            service_names.split(","))
-
+        services_ids = list(filter(bool, service_names.split(",")))
         try:
-            service_ids = await self.application.services.list_services(
-                services_ids,
-                network)
-
+            service_ids = await self.application.services.list_services(services_ids, network)
         except ServiceNotFound as e:
-            raise HTTPError(
-                404,
-                "Service '{0}' was not found".format(e.service_id))
-
+            raise HTTPError(404, "Service '{0}' was not found".format(e.service_id))
         self.dumps(service_ids)
 
 
