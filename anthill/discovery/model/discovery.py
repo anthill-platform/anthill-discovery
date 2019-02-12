@@ -59,7 +59,7 @@ class DiscoveryModel(Model):
             _data = {"services": {}}
             db_keys = await db.keys("*")
             try:
-                data_keys = data["services"].keys()
+                data_keys = list(data["services"].keys())
             except KeyError:
                 raise DiscoveryError(400, "Init file has no 'services' section defined.")
             else:

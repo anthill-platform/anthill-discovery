@@ -182,7 +182,7 @@ class ServicesController(a.AdminController):
         services = await services_data.list_all_services("external")
 
         result = {
-            "services": services.keys()
+            "services": list(services.keys())
         }
 
         return result
